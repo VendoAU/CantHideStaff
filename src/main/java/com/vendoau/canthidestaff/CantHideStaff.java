@@ -1,34 +1,29 @@
 package com.vendoau.canthidestaff;
 
+import com.vendoau.canthidestaff.mode.BroadcastMode;
+import com.vendoau.canthidestaff.mode.PacketMode;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CantHideStaff extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        int pluginId = 10143;
-        Metrics metrics = new Metrics(this, pluginId);
+        getConfig().options().copyDefaults(true);
+        saveConfig();
 
-        getServer().getPluginManager().registerEvents(this, this);
-    }
+        new Metrics(this, 10143);
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onChat(AsyncPlayerChatEvent event) {
-        Player player = event.getPlayer();
-
-        if (player.hasPermission("canthidestaff.staff")) {
-            event.setCancelled(true);
-
-            Bukkit.broadcastMessage(event.getFormat()
-                    .replace("%1$s", player.getDisplayName())
-                    .replace("%2$s", event.getMessage()));
+        if (getConfig().getBoolean("packet")) {
+            if (getServer().getPluginManager().getPlugin("ProtocolLib") == null) {
+                getLogger().severe("ProtocolLib is required for packet mode");
+                getServer().getPluginManager().disablePlugin(this);
+            } else {
+                new PacketMode(this);
+            }
+        } else {
+            new BroadcastMode(this);
         }
     }
 }

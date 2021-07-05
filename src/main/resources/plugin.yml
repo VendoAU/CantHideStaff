@@ -6,6 +6,9 @@ api-version: 1.16
 description: Prevent chat messages from staff members being hidden
 author: VendoAU
 
+softdepend: [ ProtocolLib ]
+
 permissions:
   canthidestaff.staff:
     description: Messages from players that have this permission can't be hidden
+    default: op
